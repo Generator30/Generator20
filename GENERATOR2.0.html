@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generator Zaszyfrowanego Linku</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 2em;
+      background: #f8f8f8;
+      max-width: 600px;
+      margin: auto;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 1em;
+    }
+    input {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.3em;
+    }
+    button {
+      width: 100%;
+      margin-top: 1.5em;
+      padding: 0.8em;
+    }
+    pre {
+      background: #f0f0f0;
+      padding: 1em;
+      word-break: break-word;
+    }
+    button.copy {
+      width: auto;
+      padding: 0.5em 1em;
+      margin-top: 0.5em;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button.copy:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🔐 Generator Zaszyfrowanego Linku</h2>
+
+<form id="form">
+  <label>Imię:</label>
+  <input type="text" name="name" value="" required>
+
+  <label>Nazwisko:</label>
+  <input type="text" name="surname" value="" required>
+
+  <label>Data urodzenia (dd.mm.yyyy):</label>
+  <input type="text" name="birthday" value="" required>
+
+  <label>Płeć (m/k):</label>
+  <input type="text" name="sex" value="m" required>
+
+  <label>Narodowość:</label>
+  <input type="text" name="nationality" value="polska">
+
+  <label>Adres 1:</label>
+  <input type="text" name="adress1" value="Kwiatowa 12">
+
+  <label>Adres 2:</label>
+  <input type="text" name="adress2" value="m. 4">
+
+  <label>Miasto:</label>
+  <input type="text" name="city" value="Warszawa">
+
+  <label>Miejsce urodzenia:</label>
+  <input type="text" name="birthPlace" value="Warszawa">
+
+  <label>Kraj urodzenia:</label>
+  <input type="text" name="countryOfBirth" value="Polska">
+
+  <label>Nazwisko panieńskie matki:</label>
+  <input type="text" name="mothersFamilyName" value="Kowalska">
+
+  <label>Nazwisko panieńskie ojca:</label>
+  <input type="text" name="fathersFamilyName" value="">
+
+  <label>Obrazek (URL):</label>
+  <input type="text" name="image" value="">
+
+  <button type="submit">🔐 Wygeneruj link</button>
+</form>
+
+<h3>📎 Wygenerowany link:</h3>
+<pre id="output">(Brak danych)</pre>
+<button class="copy" onclick="copyToClipboard()">📋 Skopiuj link</button>
+
+<script>
+  function copyToClipboard() {
+    const text = document.getElementById('output').textContent;
+    if (!text || text === '(Brak danych)') {
+      alert('Brak linku do skopiowania.');
+      return;
+    }
+
+    navigator.clipboard.writeText(text)
+      .then(() => alert('✅ Link został skopiowany do schowka!'))
+      .catch(() => alert('❌ Nie udało się skopiować linku.'));
+  }
+
+  document.getElementById('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const form = new FormData(e.target);
+    const key = "tajny_klucz"; // klucz zaszyty na stałe
+    const params = new URLSearchParams();
+
+    for (const [k, v] of form.entries()) {
+      params.append(k, v);
+    }
+
+    const plainText = params.toString();
+    const encrypted = CryptoJS.AES.encrypt(plainText, key).toString();
+    const encoded = encodeURIComponent(encrypted);
+
+    const finalLink = `https://wifixyzsite.netlify.app/id?${encoded}`;
+    document.getElementById('output').textContent = finalLink;
+  });
+</script>
+
+</body>
+</html>
